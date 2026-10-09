@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sen meni sevasanmi? 💌</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg1:#ffe3ec;--bg2:#ffb8d1;--ink:#8a1c4a;--btn:#e8336d;--btn2:#fff;}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*:before,*:after{box-sizing:inherit}
+body{margin:0;height:100%;background:linear-gradient(160deg,var(--bg1),var(--bg2));font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;color:var(--ink);overflow:hidden;-webkit-tap-highlight-color:transparent}
+#root{height:100%}
+.page{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:5vh 20px 8vh;text-align:center;position:relative;z-index:2}
+.top{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;width:100%}
+h1{font-size:clamp(30px,9vw,54px);margin:0;line-height:1.15;animation:pop .7s ease}
+.sub{font-size:clamp(18px,5vw,26px);margin:0;min-height:1.6em;font-weight:600;animation:pop .5s ease}
+.emoji{font-size:clamp(60px,18vw,96px);animation:beat 1.2s infinite}
+.btns{display:flex;gap:22px;justify-content:center;align-items:center;width:100%;min-height:72px}
+button{font-size:clamp(20px,5.5vw,26px);font-weight:700;border:0;border-radius:999px;padding:14px 38px;cursor:pointer;box-shadow:0 6px 16px rgba(138,28,74,.25);touch-action:manipulation;transition:transform .3s ease}
+.yes{background:var(--btn);color:#fff}
+.no{background:var(--btn2);color:var(--btn)}
+.no.fly{position:fixed;transition:left .35s ease,top .35s ease;z-index:5}
+.hearts{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;width:min(260px,70vw)}
+.hearts svg{width:100%;height:auto;overflow:visible}
+.hp{fill:rgba(232,51,109,0);stroke:var(--btn);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:200;stroke-dashoffset:200;animation:draw 2.2s ease forwards,fillin 1s ease forwards}
+.love{font-size:clamp(20px,5.6vw,30px);font-weight:600;min-height:3.2em;max-width:420px;line-height:1.35;animation:fadeup 1s ease both}
+.final{font-size:clamp(26px,8vw,44px);font-weight:800;animation:pop 1s ease both}
+.bg{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+.bg span{position:absolute;bottom:-60px;opacity:0;animation:rise linear infinite}
+@keyframes rise{0%{transform:translateY(0) rotate(0);opacity:0}10%{opacity:.7}90%{opacity:.5}100%{transform:translateY(-115vh) rotate(25deg);opacity:0}}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes fillin{to{fill:rgba(232,51,109,1)}}
+@keyframes pop{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+@keyframes fadeup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes beat{50%{transform:scale(1.12)}}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg1:#3a1026;--bg2:#6b1d44;--ink:#ffd6e5}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script>
+const h = React.createElement;
+const { useState, useEffect, useMemo } = React;
+const HEART = "M50 88 C20 62 6 44 6 28 C6 14 17 6 29 6 C39 6 46 12 50 20 C54 12 61 6 71 6 C83 6 94 14 94 28 C94 44 80 62 50 88 Z";
+
+const TEASE = ["", "Adashding shekilli 😏", "Yana urinib ko'r 😜", "Qo'lingdan kelmaydi 😄", "Men xafa bo'ldim 😢"];
+const LOVE = [
+  "Sen mening eng chiroyli tushimsan ✨",
+  "Sen kulganingda butun dunyo yorishadi 🌸",
+  "Sening yoningda vaqt to'xtab qoladi ⏳",
+  "Sen mening baxtimsan, tinchligimsan 🕊️",
+  "Har kuni seni ko'proq sevaman 💞",
+  "Seni butun yuragim bilan yaxshi ko'raman ❤️"
+];
+
+function Heart({ delay }) {
+  return h("svg", { viewBox: "0 0 100 94" },
+    h("path", { className: "hp", d: HEART, style: { animationDelay: delay + "s," + (delay + 1.5) + "s" } }));
+}
+
+function Background() {
+  const items = useMemo(() => Array.from({ length: 16 }, () => ({
+    left: Math.random() * 100,
+    size: 16 + Math.random() * 26,
+    dur: 7 + Math.random() * 7,
+    delay: Math.random() * 8,
+    e: ["❤", "💗", "💖", "🌹", "✨"][Math.floor(Math.random() * 5)]
+  })), []);
+  return h("div", { className: "bg" }, items.map((it, i) =>
+    h("span", { key: i, style: { left: it.left + "%", fontSize: it.size, animationDuration: it.dur + "s", animationDelay: it.delay + "s" } }, it.e)));
+}
+
+function Yes() {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    const t0 = setTimeout(() => setI(1), 6500);
+    return () => clearTimeout(t0);
+  }, []);
+  useEffect(() => {
+    if (i < 1 || i > LOVE.length) return;
+    const t = setTimeout(() => setI(i + 1), 3300);
+    return () => clearTimeout(t);
+  }, [i]);
+  const done = i > LOVE.length;
+  return h("div", { className: "page" },
+    h("div", { className: "top" },
+      h("h1", null, "Men ham seni sevaman! ❤️"),
+      h("div", { className: "hearts" },
+        Array.from({ length: 9 }, (_, k) => h(Heart, { key: k, delay: 0.6 + k * 0.6 }))),
+      done
+        ? h("div", { className: "final" }, "Faqat sen — abadiy 💍")
+        : i >= 1 && h("div", { className: "love", key: i }, LOVE[i - 1])));
+}
+
+function App() {
+  const [yes, setYes] = useState(false);
+  const [moves, setMoves] = useState(0);
+  const [pos, setPos] = useState(null);
+
+  const runAway = () => {
+    if (moves >= 4) return;
+    const w = Math.min(160, window.innerWidth * 0.4), hh = 64;
+    setPos({
+      x: Math.random() * (window.innerWidth - w - 20) + 10,
+      y: Math.random() * (window.innerHeight - hh - 20) + 10
+    });
+    setMoves(moves + 1);
+  };
+
+  const upset = moves >= 4;
+  return h(React.Fragment, null,
+    h(Background),
+    yes ? h(Yes) : h("div", { className: "page" },
+      h("div", { className: "top" },
+        h("div", { className: "emoji" }, upset ? "😔" : "💌"),
+        h("h1", null, "Sen meni sevasanmi?"),
+        h("p", { className: "sub", key: moves }, TEASE[moves])),
+      h("div", { className: "btns" },
+        h("button", { className: "yes", style: { transform: "scale(" + (1 + moves * 0.12) + ")" }, onClick: () => setYes(true) }, "Ha"),
+        upset ? null : h("button", {
+          className: "no" + (pos ? " fly" : ""),
+          style: pos ? { left: pos.x, top: pos.y } : undefined,
+          onClick: runAway,
+          onTouchStart: (e) => { e.preventDefault(); runAway(); }
+        }, "Yo'q"))));
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(h(App));
+</script>
+</body>
+</html>
